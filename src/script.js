@@ -74,19 +74,56 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
  const moonColorTexture = textureLoader.load('/moon.jpeg')
  const moonDisplacementTexture = textureLoader.load('/moonDisplacementTexture.jpeg')
+ const starTexture = textureLoader.load('/starTexture.png')
 
 const material = new THREE.MeshStandardMaterial()
 material.map = moonColorTexture
 material.displacementMap = moonDisplacementTexture
 material.displacementScale = 0.01
-material.minFilter = THREE.NearestFilter
-material.magFilter = THREE.NearestFilter
+ material.minFilter = THREE.NearestFilter
+ material.magFilter = THREE.NearestFilter
 
 const moon = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 32),
     material
 )
 scene.add(moon)
+
+const sun = new THREE.Mesh(
+    new THREE.SphereGeometry(2, 32, 32),
+    new THREE.MeshBasicMaterial(0xffffff)
+)
+sun.position.set(5, 5, -1.8)
+//scene.add(sun)
+
+// points
+const count = 10000
+const positions = new Float32Array(count * 3)
+
+for (let i = 0; i < count; i++){
+    const i3 = i*3
+    positions[i3 + 0] = (Math.random()-0.5) * 40
+    positions[i3 + 1] = (Math.random()-0.5) * 40
+    positions[i3 + 2] = (Math.random()-0.5) * 40
+}
+
+const pointsGeometry = new THREE.BufferGeometry()
+pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+const pointsMaterial = new THREE.PointsMaterial({
+    size: 0.08,
+    sizeAttenuation: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+    alphaMap: starTexture
+})
+
+gui.add(pointsMaterial, 'size', 0.01, 0.2, 0.001).name('starSize')
+
+const points = new THREE.Points(pointsGeometry, pointsMaterial)
+scene.add(points)
+
 
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1)
 directionalLight.position.set(5, 5, -1.8)

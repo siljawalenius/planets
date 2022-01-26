@@ -72,7 +72,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  * Cube
  */
 
- const moonColorTexture = textureLoader.load('/moon.jpeg')
+ const moonColorTexture = textureLoader.load('/moonGrain.jpg')
  const moonDisplacementTexture = textureLoader.load('/moonDisplacementTexture.jpeg')
  const starTexture = textureLoader.load('/starTexture.png')
 
@@ -130,7 +130,10 @@ directionalLight.position.set(5, 5, -1.8)
 scene.add(directionalLight)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
-//scene.add(ambientLight)
+ambientLight.intensity = 0.15
+scene.add(ambientLight)
+
+gui.add(ambientLight, 'intensity', 0, 1, 0.001).name('ambientIntensity')
 
 gui.add(directionalLight.position, 'x', -10, 10, 0.001)
 gui.add(directionalLight.position, 'y', -10, 10, 0.001)

@@ -168,7 +168,7 @@ gui.add(directionalLight.position, "z", -10, 10, 0.001);
   });
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  
+  renderer.setClearColor('#07040C') 
 
 
 /**
@@ -189,9 +189,6 @@ const tick = () => {
     0,
     Math.sin(elapsedTime * 0.25) * moonRadius
   )
-
-
-  console.log(moon.position.z)
 
   // Update controls
   controls.update();

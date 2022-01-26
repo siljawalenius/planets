@@ -76,7 +76,7 @@ const moonDisplacementTexture = textureLoader.load(
   "/moonDisplacementTexture.jpeg"
 );
 const starTexture = textureLoader.load("/starTexture.png");
-const sunTexture = textureLoader.load("/sun.jpg");
+const sunTexture = textureLoader.load("/sunGrain.jpg");
 
 const moonMaterial = new THREE.MeshStandardMaterial();
 moonMaterial.map = moonColorTexture;

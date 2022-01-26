@@ -99,7 +99,6 @@ const sun = new THREE.Mesh(
 );
 sun.position.set(0, 0, 0);
 scene.add(sun)
-//sun should be at 0,0,0, with everything else positioned around it 
 //size size of radius 4 maybe? or 5
 //other planets will ofc be smaller, but not to physical proportions (keep UX good)
 

@@ -1,0 +1,29 @@
+{
+    "planets":{
+        "mercury": {
+            "areas": ["communication", "learning", "reading", "editing", "researching", "negotiating", "selling and buying", "contracts", "agreements", "important documents", "code", "travelling", "shipping"],
+            "retrogradeEffects": ["increased stress levels", "unclear communication", "unplanned obstacles"],
+            "2022" : ["Jan 14 - Feb 03", "May 10 - June 02", "Sept 09 - Oct 02", "Dec 29 - Jan 18"],
+            "avgNumber": 3,
+            "weeks": 3.5 
+        },
+        "venus":{
+            "areas":[ "intimacy", "beauty", "reativity", "love"],
+            "retrogradeEffects":["return of past loves", "confronting issues", "new relationships", ""],
+            "2022" : ["Dec 19, 2021 - Jan 29, 2022"],
+            "avgNumber": 1,
+            "weeks": 5.7
+        }, 
+        "moon":{
+            "new": ["intentions", "manifesting", "new beginnings"],
+            "waxing": ["planning", "self confidence", "self assurance"],
+            "first quarter": ["reflection", "pause", "self appreciation"],
+            "full": ["release of old energy", "clarity", "reflection"],
+            "third quarter": ["Letting go", "Releasing", "Cleaning"],
+            "waning": ["Resting", "Self-Kindness", "Compassion"]
+
+        }
+
+
+    }
+}

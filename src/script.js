@@ -33,6 +33,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor("#07040C");
+renderer.shadowMap.enabled = true;
 
 window.addEventListener("resize", () => {
   // Update sizes
@@ -114,6 +115,7 @@ const earth = new THREE.Mesh(
 const earthRadius = 40;
 earthGroup.position.set(earthRadius, 0, 0);
 earthGroup.add(earth);
+earth.castShadow = true;
 
 const moonMaterial = new THREE.MeshStandardMaterial();
 moonMaterial.map = moonColorTexture;
@@ -128,6 +130,7 @@ const moon = new THREE.Mesh(
 );
 const moonRadius = 5;
 moon.position.set(moonRadius, 0, 0);
+moon.receiveShadow = true;
 earthGroup.add(moon);
 
 const venusMaterial = new THREE.MeshStandardMaterial();
@@ -175,7 +178,7 @@ pointsGeometry.setAttribute(
 );
 
 const pointsMaterial = new THREE.PointsMaterial({
-  size: 0.08,
+  size: 0.3,
   sizeAttenuation: true,
   depthWrite: false,
   blending: THREE.AdditiveBlending,
@@ -196,23 +199,28 @@ gui.add(pointsMaterial, "size", 0.01, 0.2, 0.001).name("starSize");
 //LIGHTS
 //
 
-const directionalLight = new THREE.DirectionalLight("#ffffff", 1);
-//directionalLight.position.set(5, 5, -1.8);
-directionalLight.position.set(0, 0, 0);
-directionalLight.target = moon;
+const createDirectionalLight = (target, castShadow) => {
+  const directionalLight = new THREE.DirectionalLight("#ffffff", 1);
+  directionalLight.position.set(0, 0, 0);
+  directionalLight.target = target;
+  directionalLight.castShadow = castShadow;
+  scene.add(directionalLight);
 
-const helper = new THREE.DirectionalLightHelper(directionalLight, 5);
-//scene.add( helper );
-scene.add(directionalLight);
+  directionalLight.shadow.camera.near = 40; 
+  directionalLight.shadow.camera.far = 46; 
+
+  // const helper = new THREE.CameraHelper( directionalLight.shadow.camera );
+  // scene.add( helper );
+};
+
+createDirectionalLight(earth, true);
 
 const ambientLight = new THREE.AmbientLight(0xffffff);
-ambientLight.intensity = 0.15;
+ambientLight.intensity = 0.9;
+// 0.15
 scene.add(ambientLight);
 
 gui.add(ambientLight, "intensity", 0, 1, 0.001).name("ambientIntensity");
-gui.add(directionalLight.position, "x", -10, 10, 0.001);
-gui.add(directionalLight.position, "y", -10, 10, 0.001);
-gui.add(directionalLight.position, "z", -10, 10, 0.001);
 
 /**
  * Animate
@@ -238,20 +246,21 @@ const tick = () => {
   // rotate moon around earth
   earthGroup.rotation.y = elapsedTime * 0.45;
 
-  //rotate mercury around sun 
+  //rotate mercury around sun
   mercury.position.set(
     Math.cos(elapsedTime) * mercuryRadius,
     0,
     Math.sin(elapsedTime) * mercuryRadius
   );
-  mercury.rotation.y = elapsedTime * 0.012 //rotate mercury around itself
+  mercury.rotation.y = elapsedTime * 0.012; //rotate mercury around itself
 
-    //rotate venus around sun 
-    venus.position.set(
-      Math.cos(elapsedTime * 0.5) * venusRadius,
-      0,
-      Math.sin(elapsedTime * 0.5) * venusRadius
-    );
+  //rotate venus around sun
+  venus.position.set(
+    Math.cos(elapsedTime * 0.5) * venusRadius,
+    0,
+    Math.sin(elapsedTime * 0.5) * venusRadius
+  );
+  mercury.rotation.y = elapsedTime * -0.002; //rotate mercury around itself
 
   // Update controls
   controls.update();

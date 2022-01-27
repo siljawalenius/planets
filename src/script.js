@@ -157,6 +157,55 @@ const mercuryRadius = 15;
 mercury.position.set(mercuryRadius, 0, 0);
 scene.add(mercury);
 
+const mars = new THREE.Mesh(
+  new THREE.SphereGeometry(0.8, 32, 32),
+  new THREE.MeshStandardMaterial({color:'#ff0000'})
+)
+const marsRadius = 52
+mars.position.set(marsRadius, 0 , 0)
+scene.add(mars)
+
+const jupiter = new THREE.Mesh(
+  new THREE.SphereGeometry(3, 32, 32),
+  new THREE.MeshStandardMaterial({color: '#d2b48c'})
+)
+const jupiterRadius = 70
+jupiter.position.set(jupiterRadius, 0, 0)
+scene.add(jupiter)
+
+const saturn = new THREE.Group()
+const saturnBody = new THREE.Mesh(
+  new THREE.SphereGeometry(2.5, 32, 32),
+  new THREE.MeshStandardMaterial({color: '#d2b48c'})
+)
+const saturnRings = new THREE.Mesh(
+  new THREE.TorusGeometry(4, 0.5, 32, 32),
+  new THREE.MeshStandardMaterial({color: '#d2b48c'})
+)
+saturnRings.rotation.x = Math.PI * 0.45
+saturn.add(saturnBody, saturnRings)
+const saturnRadius = 90
+saturn.position.set(saturnRadius, 0, 0)
+scene.add(saturn)
+
+const uranus = new THREE.Mesh(
+  new THREE.SphereGeometry(2, 32, 32),
+  new THREE.MeshStandardMaterial({color: '#0000ff'})
+)
+const uranusRadius = 110
+uranus.position.set(0, 0, uranusRadius)
+scene.add(uranus)
+
+const neptune = new THREE.Mesh(
+  new THREE.SphereGeometry(1.5, 32, 32),
+  new THREE.MeshStandardMaterial({color: '#30D5C8'})
+)
+const neptuneRadius = 130
+neptune.position.set(- neptuneRadius, 0, 0)
+scene.add(neptune)
+
+
+
 //
 // STARS
 //
@@ -261,6 +310,39 @@ const tick = () => {
     Math.sin(elapsedTime * 0.5) * venusRadius
   );
   mercury.rotation.y = elapsedTime * -0.002; //rotate mercury around itself
+
+
+  mars.position.set(
+    Math.cos(elapsedTime * 0.125) * marsRadius,
+    0,
+    Math.sin(elapsedTime * 0.125) * marsRadius
+  )
+
+  jupiter.position.set(
+    Math.cos(elapsedTime * 0.0208) * jupiterRadius,
+    0,
+    Math.sin(elapsedTime * 0.0208) * jupiterRadius
+  )
+
+  saturn.position.set(
+    Math.cos(elapsedTime * 0.018) * saturnRadius,
+    0,
+    Math.sin(elapsedTime * 0.018) * saturnRadius
+  )
+
+  // uranus.position.set(
+  //   Math.cos(elapsedTime * 0.009) * uranusRadius,
+  //   0,
+  //   Math.sin(elapsedTime * 0.009) * uranusRadius
+  // )
+
+  //0.0045
+
+  neptune.position.set(
+    Math.cos(elapsedTime * 0.0045) * neptuneRadius ,
+    0,
+    Math.sin(elapsedTime * 0.0045) * neptuneRadius
+  )
 
   // Update controls
   controls.update();

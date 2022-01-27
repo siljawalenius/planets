@@ -2,6 +2,7 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
+import { Path } from "three";
 
 const gui = new GUI();
 
@@ -21,6 +22,17 @@ const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
+
+/**
+ * Renderer
+ */
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor("#07040C");
 
 window.addEventListener("resize", () => {
   // Update sizes
@@ -63,9 +75,8 @@ controls.enableDamping = true;
 //
 //Axes Helper
 //
-const axesHelper = new THREE.AxesHelper( 50 );
+const axesHelper = new THREE.AxesHelper(50);
 //scene.add( axesHelper );
-
 
 /**
  * PLANETS
@@ -77,6 +88,32 @@ const moonDisplacementTexture = textureLoader.load(
 );
 const starTexture = textureLoader.load("/starTexture.png");
 const sunTexture = textureLoader.load("/sunGrain.jpg");
+const venusTexture = textureLoader.load("/venus.jpg");
+const mercuryTexture = textureLoader.load("/mercury.jpg");
+const mercuryBumpTexture = textureLoader.load("/mercurybump.jpg");
+const earthTexture = textureLoader.load("/earth.jpg");
+
+const sunMaterial = new THREE.MeshBasicMaterial(0xffffff);
+sunMaterial.map = sunTexture;
+
+const sun = new THREE.Mesh(new THREE.SphereGeometry(4, 32, 32), sunMaterial);
+sun.position.set(-0.1, 0, 0); //since the sun is not the center of the universe
+scene.add(sun);
+//size size of radius 4 maybe? or 5
+//other planets will ofc be smaller, but not to physical proportions (keep UX good)
+
+const earthMaterial = new THREE.MeshStandardMaterial();
+earthMaterial.map = earthTexture;
+
+const earthGroup = new THREE.Group();
+scene.add(earthGroup);
+const earth = new THREE.Mesh(
+  new THREE.SphereGeometry(1, 32, 32),
+  earthMaterial
+);
+const earthRadius = 40;
+earthGroup.position.set(earthRadius, 0, 0);
+earthGroup.add(earth);
 
 const moonMaterial = new THREE.MeshStandardMaterial();
 moonMaterial.map = moonColorTexture;
@@ -85,26 +122,41 @@ moonMaterial.displacementScale = 0.01;
 moonMaterial.minFilter = THREE.NearestFilter;
 moonMaterial.magFilter = THREE.NearestFilter;
 
-const moon = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), moonMaterial);
-const moonRadius = 20
-moon.position.set(moonRadius, 0, 0)
-scene.add(moon);
-
-const sunMaterial = new THREE.MeshBasicMaterial(0xffffff)
-sunMaterial.map = sunTexture
-
-const sun = new THREE.Mesh(
-  new THREE.SphereGeometry(4, 32, 32),
-  sunMaterial
+const moon = new THREE.Mesh(
+  new THREE.SphereGeometry(0.3, 32, 32),
+  moonMaterial
 );
-sun.position.set(0, 0, 0);
-scene.add(sun)
-//size size of radius 4 maybe? or 5
-//other planets will ofc be smaller, but not to physical proportions (keep UX good)
+const moonRadius = 5;
+moon.position.set(moonRadius, 0, 0);
+earthGroup.add(moon);
+
+const venusMaterial = new THREE.MeshStandardMaterial();
+venusMaterial.map = venusTexture;
+
+const venus = new THREE.Mesh(
+  new THREE.SphereGeometry(0.5, 32, 32),
+  venusMaterial
+);
+const venusRadius = 25;
+venus.position.set(venusRadius, 0, 0);
+scene.add(venus);
+
+const mercuryMaterial = new THREE.MeshStandardMaterial();
+mercuryMaterial.map = mercuryTexture;
+mercuryMaterial.displacementMap = mercuryBumpTexture;
+mercuryMaterial.displacementScale = 0.01;
+
+const mercury = new THREE.Mesh(
+  new THREE.SphereGeometry(0.3, 32, 32),
+  mercuryMaterial
+);
+const mercuryRadius = 15;
+mercury.position.set(mercuryRadius, 0, 0);
+scene.add(mercury);
 
 //
 // STARS
-// 
+//
 
 const count = 10000;
 const positions = new Float32Array(count * 3);
@@ -135,17 +187,21 @@ scene.add(stars);
 
 gui.add(pointsMaterial, "size", 0.01, 0.2, 0.001).name("starSize");
 
+//
+// Paths
+//
+//ask amelie how to add paths
 
 //
 //LIGHTS
-// 
+//
 
 const directionalLight = new THREE.DirectionalLight("#ffffff", 1);
 //directionalLight.position.set(5, 5, -1.8);
 directionalLight.position.set(0, 0, 0);
-directionalLight.target = moon
+directionalLight.target = moon;
 
-const helper = new THREE.DirectionalLightHelper( directionalLight, 5 );
+const helper = new THREE.DirectionalLightHelper(directionalLight, 5);
 //scene.add( helper );
 scene.add(directionalLight);
 
@@ -158,19 +214,6 @@ gui.add(directionalLight.position, "x", -10, 10, 0.001);
 gui.add(directionalLight.position, "y", -10, 10, 0.001);
 gui.add(directionalLight.position, "z", -10, 10, 0.001);
 
-
-/**
- * Renderer
- */
- const renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    antialias: true,
-  });
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor('#07040C') 
-
-
 /**
  * Animate
  */
@@ -182,13 +225,33 @@ const tick = () => {
   const deltaTime = elapsedTime - lastElapsedTime;
   lastElapsedTime = elapsedTime;
 
-  moon.rotation.y = elapsedTime * 0.1;
+  //roate the earth and moon individually
+  earth.rotation.y = elapsedTime * 0.7;
+  moon.rotation.y = elapsedTime * 0.45;
 
-  moon.position.set(
-    Math.cos(elapsedTime * 0.25) * moonRadius,
+  //rotate the whole earth group
+  earthGroup.position.set(
+    Math.cos(elapsedTime * 0.25) * earthRadius,
     0,
-    Math.sin(elapsedTime * 0.25) * moonRadius
-  )
+    Math.sin(elapsedTime * 0.25) * earthRadius
+  );
+  // rotate moon around earth
+  earthGroup.rotation.y = elapsedTime * 0.45;
+
+  //rotate mercury around sun 
+  mercury.position.set(
+    Math.cos(elapsedTime) * mercuryRadius,
+    0,
+    Math.sin(elapsedTime) * mercuryRadius
+  );
+  mercury.rotation.y = elapsedTime * 0.012 //rotate mercury around itself
+
+    //rotate venus around sun 
+    venus.position.set(
+      Math.cos(elapsedTime * 0.5) * venusRadius,
+      0,
+      Math.sin(elapsedTime * 0.5) * venusRadius
+    );
 
   // Update controls
   controls.update();

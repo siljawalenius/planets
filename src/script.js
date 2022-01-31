@@ -60,9 +60,12 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-camera.position.x = 7.8;
-camera.position.y = 12.1;
-camera.position.z = 40;
+ camera.position.x = 7.8;
+ camera.position.y = 12.1;
+ camera.position.z = 40;
+
+//camera.position.y = 400
+
 scene.add(camera);
 
 gui.add(camera.position, "x", -25, 25, 0.001).name("cameraX");
@@ -84,9 +87,7 @@ const axesHelper = new THREE.AxesHelper(50);
  */
 
 const moonColorTexture = textureLoader.load("/moonGrain.jpg");
-const moonDisplacementTexture = textureLoader.load(
-  "/moonDisplacementTexture.jpeg"
-);
+const moonDisplacementTexture = textureLoader.load("/moonDisplacementTexture.jpeg");
 const starTexture = textureLoader.load("/starTexture.png");
 const sunTexture = textureLoader.load("/sunGrain.jpg");
 const venusTexture = textureLoader.load("/venus.jpg");
@@ -143,18 +144,24 @@ const mercury = createPlanet(0.3, mercuryRadius, 0, mercuryTexture, null, mercur
 const mars = createPlanet(0.8, marsRadius, 0, marsTexture);
 const uranus = createPlanet(2, 0, uranusRadius, null, 0x0000ff);
 const neptune = createPlanet(1.5, neptuneRadius, 0, neptuneTexture);
-const jupiter = createPlanet(3, jupiterRadius, 0, jupiterTexture, 0xd2b48c);
+const jupiter = createPlanet(3, jupiterRadius * Math.sqrt(2)/2, jupiterRadius * Math.sqrt(2)/2, jupiterTexture, 0xd2b48c);
 const earth = createPlanet(1, 0, 0, earthTexture);
 const moon = createPlanet(0.3, moonRadius, 0, moonColorTexture, null, moonDisplacementTexture);
 const saturnBody = createPlanet(2.5, 0, 0, saturnTexture);
 
-scene.add(sun);
-scene.add(venus);
-scene.add(mercury);
-scene.add(mars);
-scene.add(uranus);
-scene.add(neptune);
-scene.add(jupiter);
+scene.add(sun, venus, mercury, mars);
+
+const uranusGroup = new THREE.Group()
+uranusGroup.add(uranus) //use a group to make rotation easier
+scene.add(uranusGroup);
+
+const neptuneGroup = new THREE.Group()
+neptuneGroup.add(neptune)
+scene.add(neptuneGroup)
+
+const jupiterGroup = new THREE.Group()
+jupiterGroup.add(jupiter)
+scene.add(jupiterGroup);
 
 //earth and moon
 const earthGroup = new THREE.Group(); //group to store earth and moon
@@ -167,7 +174,6 @@ scene.add(earthGroup);
 
 //saturn
 const saturn = new THREE.Group();
-
 const saturnRings = new THREE.Mesh(
   //new THREE.TorusGeometry(4, 0.5, 32, 32),
   new THREE.RingGeometry(2.7, 5.0, 32),
@@ -177,6 +183,9 @@ saturnRings.rotation.x = Math.PI * 0.45;
 saturn.add(saturnBody, saturnRings);
 saturn.position.set(saturnRadius, 0, 0);
 scene.add(saturn);
+
+
+
 
 //
 // STARS
@@ -249,6 +258,15 @@ gui.add(ambientLight, "intensity", 0, 1, 0.001).name("ambientIntensity");
 const clock = new THREE.Clock();
 let lastElapsedTime = 0;
 
+const orbitSun = (planet, speed, radius, time) => { //orbit planet function
+  planet.position.set(
+    //rotate mercury around sun
+    - Math.cos(time * speed ) * radius,
+    0,
+    Math.sin(time * speed ) * radius
+  );
+}
+
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - lastElapsedTime;
@@ -258,53 +276,23 @@ const tick = () => {
   earth.rotation.y = elapsedTime * 0.7;
   moon.rotation.y = elapsedTime * 0.45;
 
-  earthGroup.position.set(
-    //rotate the whole earth group around sun
-    Math.cos(elapsedTime * 0.25) * earthRadius,
-    0,
-    Math.sin(elapsedTime * 0.25) * earthRadius
-  );
+
+  orbitSun(earthGroup, 0.25, earthRadius, elapsedTime)
   earthGroup.rotation.y = elapsedTime * 0.45; // rotate moon around earth
 
-  mercury.position.set(
-    //rotate mercury around sun
-    Math.cos(elapsedTime) * mercuryRadius,
-    0,
-    Math.sin(elapsedTime) * mercuryRadius
-  );
+  orbitSun(mercury, 1, mercuryRadius, elapsedTime)
   mercury.rotation.y = elapsedTime * 0.012; //rotate mercury around itself
 
-  venus.position.set(
-    // rotate venus around sun
-    Math.cos(elapsedTime * 0.5) * venusRadius,
-    0,
-    Math.sin(elapsedTime * 0.5) * venusRadius
-  );
+  orbitSun(venus, 0.5, venusRadius, elapsedTime)
   venus.rotation.y = elapsedTime * -0.002; //rotate mercury around itself
 
-  mars.position.set(
-    Math.cos(elapsedTime * 0.125) * marsRadius,
-    0,
-    Math.sin(elapsedTime * 0.125) * marsRadius
-  );
+  orbitSun(mars, 0.125, marsRadius, elapsedTime)
 
-  jupiter.position.set(
-    Math.cos(elapsedTime * 0.0208) * jupiterRadius,
-    0,
-    Math.sin(elapsedTime * 0.0208) * jupiterRadius
-  );
+  orbitSun(saturn, 0.018, saturnRadius, elapsedTime)
+  jupiterGroup.rotation.y = elapsedTime * 0.0208
+  neptuneGroup.rotation.y = elapsedTime * 0.045
+  uranusGroup.rotation.y = elapsedTime * 0.05
 
-  saturn.position.set(
-    Math.cos(elapsedTime * 0.018) * saturnRadius,
-    0,
-    Math.sin(elapsedTime * 0.018) * saturnRadius
-  );
-
-  neptune.position.set(
-    Math.cos(elapsedTime * 0.0045) * neptuneRadius,
-    0,
-    Math.sin(elapsedTime * 0.0045) * neptuneRadius
-  );
 
   // Update controls
   controls.update();

@@ -93,20 +93,27 @@ const venusTexture = textureLoader.load("/venus.jpg");
 const mercuryTexture = textureLoader.load("/mercury.jpg");
 const mercuryBumpTexture = textureLoader.load("/mercurybump.jpg");
 const earthTexture = textureLoader.load("/earth.jpg");
+const marsTexture = textureLoader.load("/mars.jpg");
+const saturnTexture = textureLoader.load("/saturn.jpg")
+const jupiterTexture = textureLoader.load("/jupiter.jpg")
+const neptuneTexture = textureLoader.load("/neptune.jpg")
 
 const planetGeometry = new THREE.SphereGeometry(1, 32, 32); //base geometry for all planets
 
-// earth, venus, mars, mercury, uranus, moon, jupiter, neptune
 
-const planets = [];
-
-const createPlanet = (scale, positionX, positionZ, texture, color) => {
-  //function for simple planets (all but saturn)
+const createPlanet = (scale, positionX, positionZ, texture, color, displacementMap) => {
   const material = new THREE.MeshStandardMaterial();
 
   texture
     ? (material.map = texture)
     : (material.color = new THREE.Color(color));
+
+
+  if(displacementMap){
+    material.displacementMap = displacementMap
+    material.displacementScale = 0.01
+  } 
+
 
   material.minFilter = THREE.NearestFilter;
   material.magFilter = THREE.NearestFilter;
@@ -118,12 +125,6 @@ const createPlanet = (scale, positionX, positionZ, texture, color) => {
 
   return planet;
 };
-
-// mercuryMaterial.displacementMap = mercuryBumpTexture;
-// mercuryMaterial.displacementScale = 0.01;
-
-// moonMaterial.displacementMap = moonDisplacementTexture;
-// moonMaterial.displacementScale = 0.01;
 
 //Planet distances
 const earthRadius = 40;
@@ -138,14 +139,14 @@ const saturnRadius = 90;
 
 const sun = createPlanet(4, 0, 0, sunTexture);
 const venus = createPlanet(0.5, venusRadius, 0, venusTexture);
-const mercury = createPlanet(0.3, mercuryRadius, 0, mercuryTexture); //need to figure out adding displacement maps
-const mars = createPlanet(0.8, marsRadius, 0, null, 0xff0000);
+const mercury = createPlanet(0.3, mercuryRadius, 0, mercuryTexture, null, mercuryBumpTexture); //need to figure out adding displacement maps
+const mars = createPlanet(0.8, marsRadius, 0, marsTexture);
 const uranus = createPlanet(2, 0, uranusRadius, null, 0x0000ff);
-const neptune = createPlanet(1.5, neptuneRadius, 0, null, 0x30d5c8);
-const jupiter = createPlanet(3, jupiterRadius, 0, null, 0xd2b48c);
+const neptune = createPlanet(1.5, neptuneRadius, 0, neptuneTexture);
+const jupiter = createPlanet(3, jupiterRadius, 0, jupiterTexture, 0xd2b48c);
 const earth = createPlanet(1, 0, 0, earthTexture);
-const moon = createPlanet(0.3, moonRadius, 0, moonColorTexture);
-const saturnBody = createPlanet(2.5, 0, 0, null, 0xd2b48c);
+const moon = createPlanet(0.3, moonRadius, 0, moonColorTexture, null, moonDisplacementTexture);
+const saturnBody = createPlanet(2.5, 0, 0, saturnTexture);
 
 scene.add(sun);
 scene.add(venus);
@@ -170,7 +171,7 @@ const saturn = new THREE.Group();
 const saturnRings = new THREE.Mesh(
   //new THREE.TorusGeometry(4, 0.5, 32, 32),
   new THREE.RingGeometry(2.7, 5.0, 32),
-  new THREE.MeshStandardMaterial({ color: "#d2b48c", side: THREE.DoubleSide })
+  new THREE.MeshStandardMaterial({ color: "#DE9E36", side: THREE.DoubleSide })
 );
 saturnRings.rotation.x = Math.PI * 0.45;
 saturn.add(saturnBody, saturnRings);

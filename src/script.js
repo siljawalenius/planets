@@ -195,9 +195,6 @@ saturn.add(saturnBody, saturnRings);
 saturn.position.set(saturnRadius, 0, 0);
 scene.add(saturn);
 
-
-
-
 //
 // STARS
 //

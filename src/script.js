@@ -2,9 +2,17 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
-import { Path } from "three";
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 
 const gui = new GUI();
+
+const params = {
+  lightRingColor: 0x787878,
+  darkRingColor: 0x2e2e2e,
+}
+
+console.log(LineMaterial)
 
 //loader
 const textureLoader = new THREE.TextureLoader();
@@ -48,6 +56,8 @@ window.addEventListener("resize", () => {
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
+
+
 
 /**
  * Camera
@@ -128,17 +138,17 @@ const createPlanet = (scale, positionX, positionZ, texture, color, displacementM
 };
 
 //Planet distances
-const earthRadius = 40;
-const venusRadius = 25;
-const mercuryRadius = 15;
-const marsRadius = 52;
-const uranusRadius = 110;
-const neptuneRadius = 130;
-const jupiterRadius = 70;
+const earthRadius = 43;
+const venusRadius = 28;
+const mercuryRadius = 18;
+const marsRadius = 55;
+const uranusRadius = 113;
+const neptuneRadius = 133;
+const jupiterRadius = 73;
 const moonRadius = 5;
-const saturnRadius = 90;
+const saturnRadius = 93;
 
-const sun = createPlanet(4, 0, 0, sunTexture);
+const sun = createPlanet(7, 0, 0, sunTexture);
 const venus = createPlanet(0.5, venusRadius, 0, venusTexture);
 const mercury = createPlanet(0.3, mercuryRadius, 0, mercuryTexture, null, mercuryBumpTexture); //need to figure out adding displacement maps
 const mars = createPlanet(0.8, marsRadius, 0, marsTexture);
@@ -223,7 +233,64 @@ gui.add(pointsMaterial, "size", 0.01, 0.2, 0.001).name("starSize");
 //
 // Paths
 //
-//ask amelie how to add paths
+
+// const earthCurve = new THREE.EllipseCurve(
+//   0 , 0, //centre x, y
+//   earthRadius, earthRadius //radius x and y 
+// )
+// const earthPoints = earthCurve.getPoints(50)
+
+// const geometry = new THREE.BufferGeometry().setFromPoints( earthPoints );
+
+// //const material = new THREE.LineBasicMaterial( { color : 0x2E2E2E} );
+// const material = new THREE.LineDashedMaterial( { color : 0x2e2e2e, linewidth: 3, scale: 1, dashSize: 0.25, gapSize: 0.25} );
+
+// // Create the final object to add to the scene
+// const ellipse = new THREE.Line( geometry, material );
+// ellipse.computeLineDistances()
+
+// ellipse.rotation.x = Math.PI * 0.5
+
+// scene.add(ellipse)
+
+const generatePath = (planetRadius, isLight) =>{
+  const curve = new THREE.EllipseCurve(
+    0 , 0, //centre x, y
+    planetRadius, planetRadius //radius x and y 
+  )
+  const points = curve.getPoints(50)
+  const geometry = new THREE.BufferGeometry().setFromPoints( points );
+  const material = new THREE.LineDashedMaterial( { 
+    color : isLight ? params.lightRingColor : params.darkRingColor, 
+    linewidth: 3, 
+    scale: 1, 
+    dashSize: 0.25, 
+    gapSize: 0.25
+  } );
+
+  const ellipse = new THREE.Line( geometry, material );
+  
+  ellipse.computeLineDistances() //comput distances to all for dashes
+  ellipse.rotation.x = Math.PI * 0.5 //rotate 90 deg, add to scene
+
+  scene.add(ellipse)
+}
+
+generatePath(earthRadius, true)
+generatePath(marsRadius)
+generatePath(venusRadius)
+generatePath(mercuryRadius)
+generatePath(jupiterRadius)
+generatePath(uranusRadius)
+generatePath(saturnRadius)
+generatePath(neptuneRadius)
+
+
+
+
+
+gui.addColor(params, "lightRingColor")
+
 
 //
 //LIGHTS
@@ -236,17 +303,19 @@ const createDirectionalLight = (target, castShadow) => {
   directionalLight.castShadow = castShadow;
   scene.add(directionalLight);
 
-  directionalLight.shadow.camera.near = 40;
-  directionalLight.shadow.camera.far = 46;
+  directionalLight.shadow.camera.near = 42;
+  directionalLight.shadow.camera.far = 48;
 
-  // const helper = new THREE.CameraHelper( directionalLight.shadow.camera );
-  // scene.add( helper );
+  //const helper = new THREE.CameraHelper( directionalLight.shadow.camera );
+  //scene.add( helper );
 };
 
 createDirectionalLight(earth, true);
 
+
+
 const ambientLight = new THREE.AmbientLight(0xffffff);
-ambientLight.intensity = 0.9;
+ambientLight.intensity = 0.7;
 // 0.15
 scene.add(ambientLight);
 
@@ -278,7 +347,7 @@ const tick = () => {
 
 
   orbitSun(earthGroup, 0.25, earthRadius, elapsedTime)
-  earthGroup.rotation.y = elapsedTime * 0.45; // rotate moon around earth
+  earthGroup.rotation.y = elapsedTime * 1.72; // rotate moon around earth - real time is 3.22
 
   orbitSun(mercury, 1, mercuryRadius, elapsedTime)
   mercury.rotation.y = elapsedTime * 0.012; //rotate mercury around itself

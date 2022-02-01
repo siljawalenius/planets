@@ -85,6 +85,7 @@ gui.add(camera.position, "z", -25, 25, 0.001).name("cameraZ");
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
+controls.maxDistance = 300
 
 //
 //Axes Helper
@@ -194,9 +195,6 @@ saturn.add(saturnBody, saturnRings);
 saturn.position.set(saturnRadius, 0, 0);
 scene.add(saturn);
 
-
-
-
 //
 // STARS
 //
@@ -206,9 +204,9 @@ const positions = new Float32Array(count * 3);
 
 for (let i = 0; i < count; i++) {
   const i3 = i * 3;
-  positions[i3 + 0] = (Math.random() - 0.5) * 400;
-  positions[i3 + 1] = (Math.random() - 0.5) * 400;
-  positions[i3 + 2] = (Math.random() - 0.5) * 400;
+  positions[i3 + 0] = (Math.random() - 0.5) * 600;
+  positions[i3 + 1] = (Math.random() - 0.5) * 600;
+  positions[i3 + 2] = (Math.random() - 0.5) * 600;
 }
 
 const pointsGeometry = new THREE.BufferGeometry();

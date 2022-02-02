@@ -2,17 +2,17 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
-import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
+import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
+import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 
 const gui = new GUI();
 
 const params = {
   lightRingColor: 0x787878,
   darkRingColor: 0x2e2e2e,
-}
+  simulationSpeed : 1
+};
 
-console.log(LineMaterial)
 
 //loader
 const textureLoader = new THREE.TextureLoader();
@@ -57,8 +57,6 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-
-
 /**
  * Camera
  */
@@ -70,9 +68,9 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
- camera.position.x = 7.8;
- camera.position.y = 12.1;
- camera.position.z = 40;
+camera.position.x = 7.8;
+camera.position.y = 12.1;
+camera.position.z = 40;
 
 //camera.position.y = 400
 
@@ -85,7 +83,7 @@ gui.add(camera.position, "z", -25, 25, 0.001).name("cameraZ");
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.maxDistance = 300
+controls.maxDistance = 300;
 
 //
 //Axes Helper
@@ -98,7 +96,9 @@ const axesHelper = new THREE.AxesHelper(50);
  */
 
 const moonColorTexture = textureLoader.load("/moonGrain.jpg");
-const moonDisplacementTexture = textureLoader.load("/moonDisplacementTexture.jpeg");
+const moonDisplacementTexture = textureLoader.load(
+  "/moonDisplacementTexture.jpeg"
+);
 const starTexture = textureLoader.load("/starTexture.png");
 const sunTexture = textureLoader.load("/sunGrain.jpg");
 const venusTexture = textureLoader.load("/venus.jpg");
@@ -106,26 +106,30 @@ const mercuryTexture = textureLoader.load("/mercury.jpg");
 const mercuryBumpTexture = textureLoader.load("/mercurybump.jpg");
 const earthTexture = textureLoader.load("/earth.jpg");
 const marsTexture = textureLoader.load("/mars.jpg");
-const saturnTexture = textureLoader.load("/saturn.jpg")
-const jupiterTexture = textureLoader.load("/jupiter.jpg")
-const neptuneTexture = textureLoader.load("/neptune.jpg")
+const saturnTexture = textureLoader.load("/saturn.jpg");
+const jupiterTexture = textureLoader.load("/jupiter.jpg");
+const neptuneTexture = textureLoader.load("/neptune.jpg");
 
 const planetGeometry = new THREE.SphereGeometry(1, 32, 32); //base geometry for all planets
 
-
-const createPlanet = (scale, positionX, positionZ, texture, color, displacementMap) => {
+const createPlanet = (
+  scale,
+  positionX,
+  positionZ,
+  texture,
+  color,
+  displacementMap
+) => {
   const material = new THREE.MeshStandardMaterial();
 
   texture
     ? (material.map = texture)
     : (material.color = new THREE.Color(color));
 
-
-  if(displacementMap){
-    material.displacementMap = displacementMap
-    material.displacementScale = 0.01
-  } 
-
+  if (displacementMap) {
+    material.displacementMap = displacementMap;
+    material.displacementScale = 0.01;
+  }
 
   material.minFilter = THREE.NearestFilter;
   material.magFilter = THREE.NearestFilter;
@@ -151,27 +155,47 @@ const saturnRadius = 93;
 
 const sun = createPlanet(7, 0, 0, sunTexture);
 const venus = createPlanet(0.5, venusRadius, 0, venusTexture);
-const mercury = createPlanet(0.3, mercuryRadius, 0, mercuryTexture, null, mercuryBumpTexture); //need to figure out adding displacement maps
+const mercury = createPlanet(
+  0.3,
+  mercuryRadius,
+  0,
+  mercuryTexture,
+  null,
+  mercuryBumpTexture
+); //need to figure out adding displacement maps
 const mars = createPlanet(0.8, marsRadius, 0, marsTexture);
 const uranus = createPlanet(2, 0, uranusRadius, null, 0x0000ff);
 const neptune = createPlanet(1.5, neptuneRadius, 0, neptuneTexture);
-const jupiter = createPlanet(3, jupiterRadius * Math.sqrt(2)/2, jupiterRadius * Math.sqrt(2)/2, jupiterTexture, 0xd2b48c);
+const jupiter = createPlanet(
+  3,
+  (jupiterRadius * Math.sqrt(2)) / 2,
+  (jupiterRadius * Math.sqrt(2)) / 2,
+  jupiterTexture,
+  0xd2b48c
+);
 const earth = createPlanet(1, 0, 0, earthTexture);
-const moon = createPlanet(0.3, moonRadius, 0, moonColorTexture, null, moonDisplacementTexture);
+const moon = createPlanet(
+  0.3,
+  moonRadius,
+  0,
+  moonColorTexture,
+  null,
+  moonDisplacementTexture
+);
 const saturnBody = createPlanet(2.5, 0, 0, saturnTexture);
 
 scene.add(sun, venus, mercury, mars);
 
-const uranusGroup = new THREE.Group()
-uranusGroup.add(uranus) //use a group to make rotation easier
+const uranusGroup = new THREE.Group();
+uranusGroup.add(uranus); //use a group to make rotation easier
 scene.add(uranusGroup);
 
-const neptuneGroup = new THREE.Group()
-neptuneGroup.add(neptune)
-scene.add(neptuneGroup)
+const neptuneGroup = new THREE.Group();
+neptuneGroup.add(neptune);
+scene.add(neptuneGroup);
 
-const jupiterGroup = new THREE.Group()
-jupiterGroup.add(jupiter)
+const jupiterGroup = new THREE.Group();
+jupiterGroup.add(jupiter);
 scene.add(jupiterGroup);
 
 //earth and moon
@@ -194,6 +218,8 @@ saturnRings.rotation.x = Math.PI * 0.45;
 saturn.add(saturnBody, saturnRings);
 saturn.position.set(saturnRadius, 0, 0);
 scene.add(saturn);
+
+const planets = [sun, mercury, venus, earth, moon, mars, jupiter, saturnBody, neptune, uranus]
 
 //
 // STARS
@@ -232,62 +258,91 @@ gui.add(pointsMaterial, "size", 0.01, 0.2, 0.001).name("starSize");
 // Paths
 //
 
-// const earthCurve = new THREE.EllipseCurve(
-//   0 , 0, //centre x, y
-//   earthRadius, earthRadius //radius x and y 
-// )
-// const earthPoints = earthCurve.getPoints(50)
-
-// const geometry = new THREE.BufferGeometry().setFromPoints( earthPoints );
-
-// //const material = new THREE.LineBasicMaterial( { color : 0x2E2E2E} );
-// const material = new THREE.LineDashedMaterial( { color : 0x2e2e2e, linewidth: 3, scale: 1, dashSize: 0.25, gapSize: 0.25} );
-
-// // Create the final object to add to the scene
-// const ellipse = new THREE.Line( geometry, material );
-// ellipse.computeLineDistances()
-
-// ellipse.rotation.x = Math.PI * 0.5
-
-// scene.add(ellipse)
-
-const generatePath = (planetRadius, isLight) =>{
+const generatePath = (planetRadius, isLight) => {
   const curve = new THREE.EllipseCurve(
-    0 , 0, //centre x, y
-    planetRadius, planetRadius //radius x and y 
-  )
-  const points = curve.getPoints(50)
-  const geometry = new THREE.BufferGeometry().setFromPoints( points );
-  const material = new THREE.LineDashedMaterial( { 
-    color : isLight ? params.lightRingColor : params.darkRingColor, 
-    linewidth: 3, 
-    scale: 1, 
-    dashSize: 0.25, 
-    gapSize: 0.25
-  } );
+    0,
+    0, //centre x, y
+    planetRadius,
+    planetRadius //radius x and y
+  );
+  const points = curve.getPoints(50);
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineDashedMaterial({
+    color: isLight ? params.lightRingColor : params.darkRingColor,
+    linewidth: 3,
+    scale: 1,
+    dashSize: 0.25,
+    gapSize: 0.25,
+  });
 
-  const ellipse = new THREE.Line( geometry, material );
-  
-  ellipse.computeLineDistances() //comput distances to all for dashes
-  ellipse.rotation.x = Math.PI * 0.5 //rotate 90 deg, add to scene
+  const ellipse = new THREE.Line(geometry, material);
 
-  scene.add(ellipse)
-}
+  ellipse.computeLineDistances(); //comput distances to all for dashes
+  ellipse.rotation.x = Math.PI * 0.5; //rotate 90 deg, add to scene
 
-generatePath(earthRadius, true)
-generatePath(marsRadius)
-generatePath(venusRadius)
-generatePath(mercuryRadius)
-generatePath(jupiterRadius)
-generatePath(uranusRadius)
-generatePath(saturnRadius)
-generatePath(neptuneRadius)
+  scene.add(ellipse);
+};
 
+generatePath(earthRadius, true);
+generatePath(marsRadius);
+generatePath(venusRadius);
+generatePath(mercuryRadius);
+generatePath(jupiterRadius);
+generatePath(uranusRadius);
+generatePath(saturnRadius);
+generatePath(neptuneRadius);
 
+gui.addColor(params, "lightRingColor");
 
+//make planets clickable
 
+const raycaster = new THREE.Raycaster(); //create raycaster
 
-gui.addColor(params, "lightRingColor")
+const cursor = new THREE.Vector2();
+
+window.addEventListener("mousemove", (event) => {
+  cursor.x = (event.clientX / sizes.width) * 2 - 1;
+  cursor.y = -((event.clientY / sizes.height) * 2) + 1;
+});
+//working
+
+let prevIntersect = false;
+
+window.addEventListener("click", () => {
+  //listen for clicks on objects
+  if (prevIntersect) {
+    switch (prevIntersect.object) {
+      case earth:
+        console.log("earth");
+        break;
+      case mars:
+        console.log("mars");
+        break;
+      case venus:
+        console.log("venus");
+        break;
+      case mercury:
+        console.log("mercury");
+        break;
+      case sun:
+        console.log("sun");
+        break;
+      case saturnBody:
+        console.log("saturn");
+        break;
+      case uranus:
+        console.log("uranus");
+        break;
+      case neptune:
+        console.log("neptune");
+        break;
+      case jupiter:
+        console.log("jupiter");
+        break;
+    }
+  }
+});
+
 
 
 //
@@ -310,8 +365,6 @@ const createDirectionalLight = (target, castShadow) => {
 
 createDirectionalLight(earth, true);
 
-
-
 const ambientLight = new THREE.AmbientLight(0xffffff);
 ambientLight.intensity = 0.7;
 // 0.15
@@ -325,24 +378,27 @@ gui.add(ambientLight, "intensity", 0, 1, 0.001).name("ambientIntensity");
 const clock = new THREE.Clock();
 let lastElapsedTime = 0;
 
-const orbitSun = (planet, speed, radius, time) => { //orbit planet function
+const orbitSun = (planet, speed, radius, time) => {
+  //orbit planet function
   planet.position.set(
     //rotate mercury around sun
-    - Math.cos(time * speed ) * radius,
+    -Math.cos(time * speed) * radius,
     0,
-    Math.sin(time * speed ) * radius
+    Math.sin(time * speed) * radius
   );
-}
+};
+
+
+gui.add(params, "simulationSpeed", 0, 2, 0.001).name("simulationSpeed");
 
 const tick = () => {
-  const elapsedTime = clock.getElapsedTime();
-  const deltaTime = elapsedTime - lastElapsedTime;
+  const elapsedTime = clock.getElapsedTime() * params.simulationSpeed * 0.5;
+  // const deltaTime = elapsedTime - lastElapsedTime;
   lastElapsedTime = elapsedTime;
 
   //rotate the earth and moon individually
   earth.rotation.y = elapsedTime * 0.7;
   moon.rotation.y = elapsedTime * 0.45;
-
 
   orbitSun(earthGroup, 0.25, earthRadius, elapsedTime)
   earthGroup.rotation.y = elapsedTime * 1.72; // rotate moon around earth - real time is 3.22
@@ -360,6 +416,18 @@ const tick = () => {
   neptuneGroup.rotation.y = elapsedTime * 0.045
   uranusGroup.rotation.y = elapsedTime * 0.05
 
+  //raycaster things
+  raycaster.setFromCamera(cursor, camera);
+
+  const intersects = raycaster.intersectObjects(planets);
+
+  if (intersects.length && prevIntersect !== true) {
+    //on mouse enter an object
+    prevIntersect = intersects[0]; //update prevIntersect
+  } else if (!intersects.length && prevIntersect) {
+    //on mouse leave an object
+    prevIntersect = false;
+  }
 
   // Update controls
   controls.update();

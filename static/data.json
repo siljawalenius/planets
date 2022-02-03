@@ -22,6 +22,20 @@
             "third quarter": ["Letting go", "Releasing", "Cleaning"],
             "waning": ["Resting", "Self-Kindness", "Compassion"]
 
+        },
+        "sun":{
+            "areas": ["communication", "learning", "reading", "editing", "researching", "negotiating", "selling and buying", "contracts", "agreements", "important documents", "code", "travelling", "shipping"],
+            "retrogradeEffects": ["increased stress levels", "unclear communication", "unplanned obstacles"],
+            "2022" : ["Jan 14 - Feb 03", "May 10 - June 02", "Sept 09 - Oct 02", "Dec 29 - Jan 18"],
+            "avgNumber": 3,
+            "weeks": 3.5 
+        },
+        "mars":{
+            "areas": ["communication", "learning", "reading", "editing", "researching", "negotiating", "selling and buying", "contracts", "agreements", "important documents", "code", "travelling", "shipping"],
+            "retrogradeEffects": ["increased stress levels", "unclear communication", "unplanned obstacles"],
+            "2022" : ["Jan 14 - Feb 03", "May 10 - June 02", "Sept 09 - Oct 02", "Dec 29 - Jan 18"],
+            "avgNumber": 3,
+            "weeks": 3.5 
         }
 
 

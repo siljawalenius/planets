@@ -236,7 +236,7 @@ const planets = [
 // Paths
 //
 
-const generatePath = (planetRadius, isLight, addToGroup, groupName) => {
+const generatePath = (planetRadius, isLight, addToGroup) => {
   const curve = new THREE.EllipseCurve(
     0,
     0, //centre x, y
@@ -261,6 +261,9 @@ const generatePath = (planetRadius, isLight, addToGroup, groupName) => {
   if (!addToGroup){
     scene.add(ellipse);
   }
+  else {
+    return ellipse; 
+  }
 };
 
 generatePath(earthRadius, true);
@@ -271,7 +274,9 @@ generatePath(jupiterRadius);
 generatePath(uranusRadius);
 generatePath(saturnRadius);
 generatePath(neptuneRadius);
-generatePath(moonRadius, true, earthGroup)
+const moonRing = generatePath(moonRadius, false, earthGroup)
+
+earthGroup.add(moonRing)
 
 //gui.addColor(params, "lightRingColor");
 

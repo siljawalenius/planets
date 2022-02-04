@@ -2,17 +2,16 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
-import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
-import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
+import starFragmentShader from "./shader/fragment.glsl";
+import starVertexShader from "./shader/vertex.glsl";
 
 const gui = new GUI();
 
 const params = {
   lightRingColor: 0x787878,
   darkRingColor: 0x2e2e2e,
-  simulationSpeed : 1
+  simulationSpeed: 1,
 };
-
 
 //loader
 const textureLoader = new THREE.TextureLoader();
@@ -89,7 +88,7 @@ controls.maxDistance = 300;
 //Axes Helper
 //
 const axesHelper = new THREE.AxesHelper(50);
-//scene.add( axesHelper );
+scene.add(axesHelper);
 
 /**
  * PLANETS
@@ -219,7 +218,18 @@ saturn.add(saturnBody, saturnRings);
 saturn.position.set(saturnRadius, 0, 0);
 scene.add(saturn);
 
-const planets = [sun, mercury, venus, earth, moon, mars, jupiter, saturnBody, neptune, uranus]
+const planets = [
+  sun,
+  mercury,
+  venus,
+  earth,
+  moon,
+  mars,
+  jupiter,
+  saturnBody,
+  neptune,
+  uranus,
+];
 
 //
 // STARS
@@ -241,18 +251,34 @@ pointsGeometry.setAttribute(
   new THREE.BufferAttribute(positions, 3)
 );
 
-const pointsMaterial = new THREE.PointsMaterial({
-  size: 0.3,
+const starMaterial = new THREE.ShaderMaterial({
+  vertexShader: starVertexShader,
+  fragmentShader: starFragmentShader,
+  uniforms: {
+    uTime: { value: 1.0 },
+    uParticleMap: { value: starTexture },
+  },
   sizeAttenuation: true,
-  depthWrite: false,
   blending: THREE.AdditiveBlending,
-  transparent: true,
-  alphaMap: starTexture,
+  depthWrite: false,
+  transparent: true
 });
-const stars = new THREE.Points(pointsGeometry, pointsMaterial);
+
+
+console.log(starMaterial)
+
+const stars = new THREE.Points(pointsGeometry, starMaterial);
 scene.add(stars);
 
-gui.add(pointsMaterial, "size", 0.01, 0.2, 0.001).name("starSize");
+//gui.add(pointsMaterial, "size", 0.01, 0.2, 0.001).name("starSize");
+
+//create array of random vals for the shader - move this to position loop
+const randomNums = new Float32Array(count);
+for (let i = 0; i < count; i++) {
+  randomNums[i] = Math.random();
+} //working
+
+pointsGeometry.setAttribute("aPhase", new THREE.BufferAttribute(randomNums, 1));
 
 //
 // Paths
@@ -343,8 +369,6 @@ window.addEventListener("click", () => {
   }
 });
 
-
-
 //
 //LIGHTS
 //
@@ -388,7 +412,6 @@ const orbitSun = (planet, speed, radius, time) => {
   );
 };
 
-
 gui.add(params, "simulationSpeed", 0, 2, 0.001).name("simulationSpeed");
 
 const tick = () => {
@@ -397,24 +420,24 @@ const tick = () => {
   lastElapsedTime = elapsedTime;
 
   //rotate the earth and moon individually
-  earth.rotation.y = elapsedTime * 0.7;
-  moon.rotation.y = elapsedTime * 0.45;
+  // earth.rotation.y = elapsedTime * 0.7;
+  // moon.rotation.y = elapsedTime * 0.45;
 
-  orbitSun(earthGroup, 0.25, earthRadius, elapsedTime)
-  earthGroup.rotation.y = elapsedTime * 1.72; // rotate moon around earth - real time is 3.22
+  // orbitSun(earthGroup, 0.25, earthRadius, elapsedTime)
+  // earthGroup.rotation.y = elapsedTime * 1.72; // rotate moon around earth - real time is 3.22
 
-  orbitSun(mercury, 1, mercuryRadius, elapsedTime)
-  mercury.rotation.y = elapsedTime * 0.012; //rotate mercury around itself
+  // orbitSun(mercury, 1, mercuryRadius, elapsedTime)
+  // mercury.rotation.y = elapsedTime * 0.012; //rotate mercury around itself
 
-  orbitSun(venus, 0.5, venusRadius, elapsedTime)
-  venus.rotation.y = elapsedTime * -0.002; //rotate mercury around itself
+  // orbitSun(venus, 0.5, venusRadius, elapsedTime)
+  // venus.rotation.y = elapsedTime * -0.002; //rotate mercury around itself
 
-  orbitSun(mars, 0.125, marsRadius, elapsedTime)
+  // orbitSun(mars, 0.125, marsRadius, elapsedTime)
 
-  orbitSun(saturn, 0.018, saturnRadius, elapsedTime)
-  jupiterGroup.rotation.y = elapsedTime * 0.0208
-  neptuneGroup.rotation.y = elapsedTime * 0.045
-  uranusGroup.rotation.y = elapsedTime * 0.05
+  // orbitSun(saturn, 0.018, saturnRadius, elapsedTime)
+  // jupiterGroup.rotation.y = elapsedTime * 0.0208
+  // neptuneGroup.rotation.y = elapsedTime * 0.045
+  // uranusGroup.rotation.y = elapsedTime * 0.05
 
   //raycaster things
   raycaster.setFromCamera(cursor, camera);
@@ -428,6 +451,10 @@ const tick = () => {
     //on mouse leave an object
     prevIntersect = false;
   }
+
+  //UPDATE STAR MATERIAL TIME
+  starMaterial.uniforms.uTime.value = elapsedTime;
+  // console.log(Math.sin(starMaterial.uniforms.uTime.value)* 0.5 + 0.5)
 
   // Update controls
   controls.update();
